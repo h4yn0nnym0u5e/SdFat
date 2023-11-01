@@ -715,7 +715,7 @@ bool SdioCard::begin(SdioConfig sdioConfig) {
   // Determine if High Speed mode is supported and set frequency.
   // Check status[16] for error 0XF or status[16] for new mode 0X1.
   uint8_t status[64];
-  // Thanks to timpilot :-)
+  // Thanks to tompilot :-)
   // https://forum.pjrc.com/threads/69460?p=331762&viewfull=1#post331762
   // Ask if highspeed mode supported. Returns true if SD card reacts to the command within timeout.
   bool highSpeedModeAsk = cardCMD6(0X00FFFFFF, status);
