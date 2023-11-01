@@ -663,6 +663,15 @@ bool SdioCard::begin(SdioConfig sdioConfig) {
       break;
     }
   }
+#if defined(__IMXRT1062__)
+  // Old version 1 cards have trouble with Teensy 4.1 after CMD8.
+  // For reasons unknown, SDIO stops working after the cards does
+  // not reply.  Simply restarting and CMD0 is a crude workaround.
+  if (!m_version2) {
+    initSDHC();
+    cardCommand(CMD0_XFERTYP, 0);
+  }
+#endif
   arg = m_version2 ? 0X40300000 : 0x00300000;
   int m = micros();
   do {
