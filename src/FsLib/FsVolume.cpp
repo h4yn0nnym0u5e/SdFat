@@ -226,7 +226,7 @@ bool FsVolume::setVolumeLabel(const char *volume_label)
     // Lets see if we found something...
     if (!volume_label || !*volume_label) {
       if (label_found) {
-        Serial.printf("Found volume label - deleted\n");
+        //Serial.printf("Found volume label - deleted\n");
         dir->name[0] = FAT_NAME_DELETED;  // mark item as deleted
         dir->attributes = 0;
         m_blockDev->writeSector(root_dir, buf);
@@ -301,7 +301,7 @@ bool FsVolume::setVolumeLabel(const char *volume_label)
     // Lets see if we found something...
     if (!volume_label || !*volume_label) {
       if (label_found) {
-        Serial.printf("Found volume label - deleted\n");
+        //Serial.printf("Found volume label - deleted\n");
         dir->type &= 0x7f;  // mark item as deleted
         m_blockDev->writeSector(root_dir, buf);
         //m_xVol->cacheSafeWrite(root_dir, buf);
