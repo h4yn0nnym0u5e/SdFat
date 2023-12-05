@@ -53,7 +53,7 @@ inline int FreeStack() {
 }
 #elif defined(__IMXRT1062__)
 #define HAS_UNUSED_STACK 1
-extern uint8_t _ebss;
+extern unsigned long _ebss;
 inline int FreeStack() {
   register uint32_t sp asm("sp");
   return reinterpret_cast<char*>(sp) - reinterpret_cast<char*>(&_ebss);
