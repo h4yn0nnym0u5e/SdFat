@@ -23,6 +23,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 #define DBG_FILE "ExFatFile.cpp"
+#include "../common/CodeLocation.h"
 #include "../common/DebugMacros.h"
 #include "../common/FsUtf.h"
 #include "ExFatLib.h"
@@ -41,7 +42,7 @@ inline bool lfnLegalChar(uint8_t c) {
 #endif  // USE_UTF8_LONG_NAMES
 }
 //------------------------------------------------------------------------------
-uint8_t* ExFatFile::dirCache(uint8_t set, uint8_t options) {
+CODE_LOCATION_SDFAT uint8_t* ExFatFile::dirCache(uint8_t set, uint8_t options) {
   DirPos_t pos = m_dirPos;
   if (m_vol->dirSeek(&pos, FS_DIR_SIZE*set) != 1) {
     return nullptr;
@@ -49,14 +50,14 @@ uint8_t* ExFatFile::dirCache(uint8_t set, uint8_t options) {
   return m_vol->dirCache(&pos, options);
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::close() {
+CODE_LOCATION_SDFAT bool ExFatFile::close() {
   bool rtn = sync();
   m_attributes = FILE_ATTR_CLOSED;
   m_flags = 0;
   return rtn;
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::contiguousRange(uint32_t* bgnSector, uint32_t* endSector) {
+CODE_LOCATION_SDFAT bool ExFatFile::contiguousRange(uint32_t* bgnSector, uint32_t* endSector) {
   if (!isContiguous()) {
     return false;
   }
@@ -70,12 +71,12 @@ bool ExFatFile::contiguousRange(uint32_t* bgnSector, uint32_t* endSector) {
   return true;
 }
 //------------------------------------------------------------------------------
-void ExFatFile::fgetpos(fspos_t* pos) const {
+CODE_LOCATION_SDFAT void ExFatFile::fgetpos(fspos_t* pos) const {
   pos->position = m_curPosition;
   pos->cluster = m_curCluster;
 }
 //------------------------------------------------------------------------------
-int ExFatFile::fgets(char* str, int num, char* delim) {
+CODE_LOCATION_SDFAT int ExFatFile::fgets(char* str, int num, char* delim) {
   char ch;
   int n = 0;
   int r = -1;
@@ -103,16 +104,16 @@ int ExFatFile::fgets(char* str, int num, char* delim) {
   return n;
 }
 //------------------------------------------------------------------------------
-uint32_t ExFatFile::firstSector() const {
+CODE_LOCATION_SDFAT uint32_t ExFatFile::firstSector() const {
   return m_firstCluster ? m_vol->clusterStartSector(m_firstCluster) : 0;
 }
 //------------------------------------------------------------------------------
-void ExFatFile::fsetpos(const fspos_t* pos) {
+CODE_LOCATION_SDFAT void ExFatFile::fsetpos(const fspos_t* pos) {
   m_curPosition = pos->position;
   m_curCluster = pos->cluster;
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::getAccessDateTime(uint16_t* pdate, uint16_t* ptime) {
+CODE_LOCATION_SDFAT bool ExFatFile::getAccessDateTime(uint16_t* pdate, uint16_t* ptime) {
   DirFile_t* df = reinterpret_cast<DirFile_t*>
                  (m_vol->dirCache(&m_dirPos, FsCache::CACHE_FOR_READ));
   if (!df) {
@@ -127,7 +128,7 @@ bool ExFatFile::getAccessDateTime(uint16_t* pdate, uint16_t* ptime) {
   return false;
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::getCreateDateTime(uint16_t* pdate, uint16_t* ptime) {
+CODE_LOCATION_SDFAT bool ExFatFile::getCreateDateTime(uint16_t* pdate, uint16_t* ptime) {
   DirFile_t* df = reinterpret_cast<DirFile_t*>
                  (m_vol->dirCache(&m_dirPos, FsCache::CACHE_FOR_READ));
   if (!df) {
@@ -142,7 +143,7 @@ bool ExFatFile::getCreateDateTime(uint16_t* pdate, uint16_t* ptime) {
   return false;
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::getModifyDateTime(uint16_t* pdate, uint16_t* ptime) {
+CODE_LOCATION_SDFAT bool ExFatFile::getModifyDateTime(uint16_t* pdate, uint16_t* ptime) {
   DirFile_t* df = reinterpret_cast<DirFile_t*>
                  (m_vol->dirCache(&m_dirPos, FsCache::CACHE_FOR_READ));
   if (!df) {
@@ -157,19 +158,19 @@ bool ExFatFile::getModifyDateTime(uint16_t* pdate, uint16_t* ptime) {
   return false;
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::isBusy() {
+CODE_LOCATION_SDFAT bool ExFatFile::isBusy() {
   return m_vol->isBusy();
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::open(const char* path, oflag_t oflag) {
+CODE_LOCATION_SDFAT bool ExFatFile::open(const char* path, oflag_t oflag) {
   return open(ExFatVolume::cwv(), path, oflag);
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::open(ExFatVolume* vol, const char* path, oflag_t oflag) {
+CODE_LOCATION_SDFAT bool ExFatFile::open(ExFatVolume* vol, const char* path, oflag_t oflag) {
   return vol && open(vol->vwd(), path, oflag);
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::open(ExFatFile* dirFile, const char* path, oflag_t oflag) {
+CODE_LOCATION_SDFAT bool ExFatFile::open(ExFatFile* dirFile, const char* path, oflag_t oflag) {
   ExFatFile tmpDir;
   ExName_t fname;
   // error if already open
@@ -212,7 +213,7 @@ bool ExFatFile::open(ExFatFile* dirFile, const char* path, oflag_t oflag) {
   return false;
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::open(ExFatFile* dirFile, uint32_t index, oflag_t oflag) {
+CODE_LOCATION_SDFAT bool ExFatFile::open(ExFatFile* dirFile, uint32_t index, oflag_t oflag) {
   if (dirFile->seekSet(FS_DIR_SIZE*index) && openNext(dirFile, oflag)) {
     if (dirIndex() == index) {
       return true;
@@ -223,7 +224,7 @@ bool ExFatFile::open(ExFatFile* dirFile, uint32_t index, oflag_t oflag) {
   return false;
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::openNext(ExFatFile* dir, oflag_t oflag) {
+CODE_LOCATION_SDFAT bool ExFatFile::openNext(ExFatFile* dir, oflag_t oflag) {
   if (isOpen() || !dir->isDir() || (dir->curPosition() & 0X1F)) {
     DBG_FAIL_MACRO;
     goto fail;
@@ -234,7 +235,7 @@ bool ExFatFile::openNext(ExFatFile* dir, oflag_t oflag) {
   return false;
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::openPrivate(ExFatFile* dir, ExName_t* fname, oflag_t oflag) {
+CODE_LOCATION_SDFAT bool ExFatFile::openPrivate(ExFatFile* dir, ExName_t* fname, oflag_t oflag) {
   int n;
   uint8_t modeFlags;
   uint32_t curCluster __attribute__((unused));
@@ -480,7 +481,7 @@ bool ExFatFile::openPrivate(ExFatFile* dir, ExName_t* fname, oflag_t oflag) {
   return false;
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::openRoot(ExFatVolume* vol) {
+CODE_LOCATION_SDFAT bool ExFatFile::openRoot(ExFatVolume* vol) {
   if (isOpen()) {
     DBG_FAIL_MACRO;
     goto fail;
@@ -495,7 +496,7 @@ bool ExFatFile::openRoot(ExFatVolume* vol) {
   return false;
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::parsePathName(const char* path,
+CODE_LOCATION_SDFAT bool ExFatFile::parsePathName(const char* path,
                             ExName_t* fname, const char** ptr) {
   // Skip leading spaces.
   while (*path == ' ') {
@@ -523,7 +524,7 @@ bool ExFatFile::parsePathName(const char* path,
   return false;
 }
 //------------------------------------------------------------------------------
-int ExFatFile::peek() {
+CODE_LOCATION_SDFAT int ExFatFile::peek() {
   uint64_t curPosition = m_curPosition;
   uint32_t curCluster = m_curCluster;
   int c = read();
@@ -532,7 +533,7 @@ int ExFatFile::peek() {
   return c;
 }
 //------------------------------------------------------------------------------
-int ExFatFile::read(void* buf, size_t count) {
+CODE_LOCATION_SDFAT int ExFatFile::read(void* buf, size_t count) {
   uint8_t* dst = reinterpret_cast<uint8_t*>(buf);
   int8_t fg;
   size_t toRead = count;
@@ -626,7 +627,7 @@ int ExFatFile::read(void* buf, size_t count) {
   return -1;
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::remove(const char* path) {
+CODE_LOCATION_SDFAT bool ExFatFile::remove(const char* path) {
   ExFatFile file;
   if (!file.open(this, path, O_WRONLY)) {
     DBG_FAIL_MACRO;
@@ -638,7 +639,7 @@ bool ExFatFile::remove(const char* path) {
   return false;
 }
 //------------------------------------------------------------------------------
-bool ExFatFile::seekSet(uint64_t pos) {
+CODE_LOCATION_SDFAT bool ExFatFile::seekSet(uint64_t pos) {
   uint32_t nCur;
   uint32_t nNew;
   uint32_t tmp = m_curCluster;

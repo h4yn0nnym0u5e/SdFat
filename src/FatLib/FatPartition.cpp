@@ -24,11 +24,12 @@
  */
 #include <string.h>
 #define DBG_FILE "FatPartition.cpp"
+#include "../common/CodeLocation.h"
 #include "../common/DebugMacros.h"
 #include "FatLib.h"
 
 //------------------------------------------------------------------------------
-bool FatPartition::allocateCluster(uint32_t current, uint32_t* next) {
+CODE_LOCATION_SDFAT bool FatPartition::allocateCluster(uint32_t current, uint32_t* next) {
   uint32_t find;
   bool setStart;
   if (m_allocSearchStart < current) {
@@ -90,7 +91,7 @@ bool FatPartition::allocateCluster(uint32_t current, uint32_t* next) {
 }
 //------------------------------------------------------------------------------
 // find a contiguous group of clusters
-bool FatPartition::allocContiguous(uint32_t count, uint32_t* firstCluster) {
+CODE_LOCATION_SDFAT bool FatPartition::allocContiguous(uint32_t count, uint32_t* firstCluster) {
   // flag to save place to start next search
   bool setStart = true;
   // start of group
@@ -155,7 +156,7 @@ bool FatPartition::allocContiguous(uint32_t count, uint32_t* firstCluster) {
 }
 //------------------------------------------------------------------------------
 // Fetch a FAT entry - return -1 error, 0 EOC, else 1.
-int8_t FatPartition::fatGet(uint32_t cluster, uint32_t* value) {
+CODE_LOCATION_SDFAT int8_t FatPartition::fatGet(uint32_t cluster, uint32_t* value) {
   uint32_t sector;
   uint32_t next;
   uint8_t* pc;
@@ -222,7 +223,7 @@ int8_t FatPartition::fatGet(uint32_t cluster, uint32_t* value) {
 }
 //------------------------------------------------------------------------------
 // Store a FAT entry
-bool FatPartition::fatPut(uint32_t cluster, uint32_t value) {
+CODE_LOCATION_SDFAT bool FatPartition::fatPut(uint32_t cluster, uint32_t value) {
   uint32_t sector;
   uint8_t* pc;
 
@@ -299,7 +300,7 @@ bool FatPartition::fatPut(uint32_t cluster, uint32_t value) {
 }
 //------------------------------------------------------------------------------
 // free a cluster chain
-bool FatPartition::freeChain(uint32_t cluster) {
+CODE_LOCATION_SDFAT bool FatPartition::freeChain(uint32_t cluster) {
   uint32_t next;
   int8_t fg;
   do {
@@ -334,7 +335,7 @@ struct FreeClusterCountStruct {
 };
 
 //------------------------------------------------------------------------------
-void FatPartition::freeClusterCount_cb_fat16(uint32_t sector, uint8_t *buf, void *context) {
+CODE_LOCATION_SDFAT void FatPartition::freeClusterCount_cb_fat16(uint32_t sector, uint8_t *buf, void *context) {
    struct FreeClusterCountStruct *state = (struct FreeClusterCountStruct *)context;
   uint16_t *p = (uint16_t *)buf;
   unsigned int n = state->clusters_to_do;
@@ -347,7 +348,7 @@ void FatPartition::freeClusterCount_cb_fat16(uint32_t sector, uint8_t *buf, void
 }
 
 //------------------------------------------------------------------------------
-void FatPartition::freeClusterCount_cb_fat32(uint32_t sector, uint8_t *buf, void *context) {
+CODE_LOCATION_SDFAT void FatPartition::freeClusterCount_cb_fat32(uint32_t sector, uint8_t *buf, void *context) {
   struct FreeClusterCountStruct *state = (struct FreeClusterCountStruct *)context;
   uint32_t *p = (uint32_t *)buf;
   unsigned int n = state->clusters_to_do;
@@ -360,7 +361,7 @@ void FatPartition::freeClusterCount_cb_fat32(uint32_t sector, uint8_t *buf, void
 }
 
 //------------------------------------------------------------------------------
-int32_t FatPartition::freeClusterCount() {
+CODE_LOCATION_SDFAT int32_t FatPartition::freeClusterCount() {
 #if MAINTAIN_FREE_CLUSTER_COUNT
   if (m_freeClusterCount >= 0) {
     return m_freeClusterCount;
@@ -413,7 +414,7 @@ int32_t FatPartition::freeClusterCount() {
 
 
 //------------------------------------------------------------------------------
-bool FatPartition::init(FsBlockDevice* dev, uint8_t part) {
+CODE_LOCATION_SDFAT bool FatPartition::init(FsBlockDevice* dev, uint8_t part) {
 //  Serial.printf(" FatPartition::init(%x %u)\n", (uint32_t)dev, part);
   uint32_t clusterCount;
   uint32_t totalSectors;
@@ -523,7 +524,7 @@ bool FatPartition::init(FsBlockDevice* dev, uint8_t part) {
 }
 
 //------------------------------------------------------------------------------
-bool FatPartition::init(FsBlockDevice* dev, uint32_t firstSector, uint32_t numSectors) {
+CODE_LOCATION_SDFAT bool FatPartition::init(FsBlockDevice* dev, uint32_t firstSector, uint32_t numSectors) {
 //  Serial.printf(" FatPartition::init(%x %u %u)\n", (uint32_t)dev, firstSector, numSectors);
   uint32_t clusterCount;
   uint32_t totalSectors;

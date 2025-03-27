@@ -23,11 +23,12 @@
  * DEALINGS IN THE SOFTWARE.
  */
 #define DBG_FILE "ExFatPartition.cpp"
+#include "../common/CodeLocation.h"
 #include "../common/DebugMacros.h"
 #include "ExFatLib.h"
 //------------------------------------------------------------------------------
 // return 0 if error, 1 if no space, else start cluster.
-uint32_t ExFatPartition::bitmapFind(uint32_t cluster, uint32_t count) {
+CODE_LOCATION_SDFAT uint32_t ExFatPartition::bitmapFind(uint32_t cluster, uint32_t count) {
   uint32_t start = cluster ? cluster - 2 : m_bitmapStart;
   if (start >= m_clusterCount) {
     start = 0;
@@ -75,7 +76,7 @@ uint32_t ExFatPartition::bitmapFind(uint32_t cluster, uint32_t count) {
   return 0;
 }
 //------------------------------------------------------------------------------
-bool ExFatPartition::bitmapModify(uint32_t cluster,
+CODE_LOCATION_SDFAT bool ExFatPartition::bitmapModify(uint32_t cluster,
                                   uint32_t count, bool value) {
   uint32_t sector;
   uint32_t start = cluster - 2;
@@ -126,7 +127,7 @@ bool ExFatPartition::bitmapModify(uint32_t cluster,
   return false;
 }
 //------------------------------------------------------------------------------
-uint32_t ExFatPartition::chainSize(uint32_t cluster) {
+CODE_LOCATION_SDFAT uint32_t ExFatPartition::chainSize(uint32_t cluster) {
   uint32_t n = 0;
   int8_t status;
   do {
@@ -137,7 +138,7 @@ uint32_t ExFatPartition::chainSize(uint32_t cluster) {
   return n;
 }
 //------------------------------------------------------------------------------
-uint8_t* ExFatPartition::dirCache(DirPos_t* pos, uint8_t options) {
+CODE_LOCATION_SDFAT uint8_t* ExFatPartition::dirCache(DirPos_t* pos, uint8_t options) {
   uint32_t sector = clusterStartSector(pos->cluster);
   sector += (m_clusterMask & pos->position) >> m_bytesPerSectorShift;
   uint8_t* cache = dataCachePrepare(sector, options);
@@ -145,7 +146,7 @@ uint8_t* ExFatPartition::dirCache(DirPos_t* pos, uint8_t options) {
 }
 //------------------------------------------------------------------------------
 // return -1 error, 0 EOC, 1 OK
-int8_t ExFatPartition::dirSeek(DirPos_t* pos, uint32_t offset) {
+CODE_LOCATION_SDFAT int8_t ExFatPartition::dirSeek(DirPos_t* pos, uint32_t offset) {
   int8_t status;
   uint32_t tmp = (m_clusterMask & pos->position) + offset;
   pos->position += offset;
@@ -164,7 +165,7 @@ int8_t ExFatPartition::dirSeek(DirPos_t* pos, uint32_t offset) {
 }
 //------------------------------------------------------------------------------
 // return -1 error, 0 EOC, 1 OK
-int8_t ExFatPartition::fatGet(uint32_t cluster, uint32_t* value) {
+CODE_LOCATION_SDFAT int8_t ExFatPartition::fatGet(uint32_t cluster, uint32_t* value) {
   uint8_t* cache;
   uint32_t next;
   uint32_t sector;
@@ -187,7 +188,7 @@ int8_t ExFatPartition::fatGet(uint32_t cluster, uint32_t* value) {
   return 1;
 }
 //------------------------------------------------------------------------------
-bool ExFatPartition::fatPut(uint32_t cluster, uint32_t value) {
+CODE_LOCATION_SDFAT bool ExFatPartition::fatPut(uint32_t cluster, uint32_t value) {
   uint32_t sector;
   uint8_t* cache;
   if (cluster < 2 || cluster > (m_clusterCount + 1)) {
@@ -207,7 +208,7 @@ bool ExFatPartition::fatPut(uint32_t cluster, uint32_t value) {
   return false;
 }
 //------------------------------------------------------------------------------
-bool ExFatPartition::freeChain(uint32_t cluster) {
+CODE_LOCATION_SDFAT bool ExFatPartition::freeChain(uint32_t cluster) {
   uint32_t next;
   uint32_t start = cluster;
   int8_t status;
@@ -237,7 +238,7 @@ bool ExFatPartition::freeChain(uint32_t cluster) {
   return false;
 }
 //------------------------------------------------------------------------------
-uint32_t ExFatPartition::freeClusterCount() {
+CODE_LOCATION_SDFAT uint32_t ExFatPartition::freeClusterCount() {
   uint32_t nc = 0;
   uint32_t sector = m_clusterHeapStartSector;
   uint32_t usedCount = 0;
@@ -266,7 +267,7 @@ uint32_t ExFatPartition::freeClusterCount() {
   }
 }
 //------------------------------------------------------------------------------
-bool ExFatPartition::init(FsBlockDevice* dev, uint8_t part) {
+CODE_LOCATION_SDFAT bool ExFatPartition::init(FsBlockDevice* dev, uint8_t part) {
   uint32_t volStart = 0;
   uint8_t* cache;
   pbs_t* pbs;
@@ -324,7 +325,7 @@ bool ExFatPartition::init(FsBlockDevice* dev, uint8_t part) {
   return false;
 }
 //------------------------------------------------------------------------------
-bool ExFatPartition::init(FsBlockDevice* dev, uint32_t firstSector, uint32_t numSectors) {
+CODE_LOCATION_SDFAT bool ExFatPartition::init(FsBlockDevice* dev, uint32_t firstSector, uint32_t numSectors) {
   uint32_t volStart = firstSector;
   uint8_t* cache;
   pbs_t* pbs;
@@ -366,7 +367,7 @@ bool ExFatPartition::init(FsBlockDevice* dev, uint32_t firstSector, uint32_t num
   return false;
 }
 //------------------------------------------------------------------------------
-uint32_t ExFatPartition::rootLength() {
+CODE_LOCATION_SDFAT uint32_t ExFatPartition::rootLength() {
   uint32_t nc = chainSize(m_rootDirectoryCluster);
   return nc << bytesPerClusterShift();
 }

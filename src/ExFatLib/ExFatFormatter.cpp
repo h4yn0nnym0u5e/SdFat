@@ -23,6 +23,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 #define DBG_FILE "ExFatFormatter.cpp"
+#include "../common/CodeLocation.h"
 #include "../common/DebugMacros.h"
 #include "../common/upcase.h"
 #include "ExFatLib.h"
@@ -46,7 +47,7 @@ const uint32_t ROOT_CLUSTER = 4;
 #define writeMsg(pr, str) if (pr) pr->write(str)
 #endif  // PRINT_FORMAT_PROGRESS
 //------------------------------------------------------------------------------
-bool ExFatFormatter::format(FsBlockDevice* dev, uint8_t* secBuf, print_t* pr) {
+CODE_LOCATION_SDFAT bool ExFatFormatter::format(FsBlockDevice* dev, uint8_t* secBuf, print_t* pr) {
 #if !PRINT_FORMAT_PROGRESS
 (void)pr;
 #endif  //  !PRINT_FORMAT_PROGRESS
@@ -289,7 +290,7 @@ bool ExFatFormatter::format(FsBlockDevice* dev, uint8_t* secBuf, print_t* pr) {
   return false;
 }
 //------------------------------------------------------------------------------
-bool ExFatFormatter::syncUpcase() {
+CODE_LOCATION_SDFAT bool ExFatFormatter::syncUpcase() {
   uint16_t index = m_upcaseSize & SECTOR_MASK;
   if (!index) {
     return true;
@@ -300,7 +301,7 @@ bool ExFatFormatter::syncUpcase() {
   return m_dev->writeSector(m_upcaseSector, m_secBuf);
 }
 //------------------------------------------------------------------------------
-bool ExFatFormatter::writeUpcaseByte(uint8_t b) {
+CODE_LOCATION_SDFAT bool ExFatFormatter::writeUpcaseByte(uint8_t b) {
   uint16_t index = m_upcaseSize & SECTOR_MASK;
   m_secBuf[index] = b;
   m_upcaseChecksum = exFatChecksum(m_upcaseChecksum, b);
@@ -311,11 +312,11 @@ bool ExFatFormatter::writeUpcaseByte(uint8_t b) {
   return true;
 }
 //------------------------------------------------------------------------------
-bool ExFatFormatter::writeUpcaseUnicode(uint16_t unicode) {
+CODE_LOCATION_SDFAT bool ExFatFormatter::writeUpcaseUnicode(uint16_t unicode) {
   return writeUpcaseByte(unicode) && writeUpcaseByte(unicode >> 8);
 }
 //------------------------------------------------------------------------------
-bool ExFatFormatter::writeUpcase(uint32_t sector) {
+CODE_LOCATION_SDFAT bool ExFatFormatter::writeUpcase(uint32_t sector) {
   uint32_t n;
   uint32_t ns;
   uint32_t ch = 0;

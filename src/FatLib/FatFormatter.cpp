@@ -22,6 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+#include "../common/CodeLocation.h"
 #include "FatLib.h"
 // Set nonzero to use calculated CHS in MBR.  Should not be required.
 #define USE_LBA_TO_CHS 1
@@ -45,7 +46,7 @@ const uint16_t FAT16_ROOT_SECTOR_COUNT =
 #define writeMsg(str) if (m_pr) m_pr->write(str)
 #endif  // PRINT_FORMAT_PROGRESS
 //------------------------------------------------------------------------------
-bool FatFormatter::format(FsBlockDevice* dev, uint8_t* secBuf, print_t* pr) {
+CODE_LOCATION_SDFAT bool FatFormatter::format(FsBlockDevice* dev, uint8_t* secBuf, print_t* pr) {
   bool rtn;
   m_dev = dev;
   m_secBuf = secBuf;
@@ -87,7 +88,7 @@ struct initFatDirState {
   uint16_t count;
   uint16_t dotcount;
 };
-static const uint8_t * initFatDirCallback(uint32_t sector, void *context) {
+CODE_LOCATION_SDFAT static const uint8_t * initFatDirCallback(uint32_t sector, void *context) {
   struct initFatDirState * state = (struct initFatDirState *)context;
   if (state->pr && ++state->count >= state->dotcount) {
     state->pr->write(".");
@@ -95,7 +96,7 @@ static const uint8_t * initFatDirCallback(uint32_t sector, void *context) {
   }
   return state->buffer;
 }
-bool FatFormatter::initFatDir(uint8_t fatType, uint32_t sectorCount) {
+CODE_LOCATION_SDFAT bool FatFormatter::initFatDir(uint8_t fatType, uint32_t sectorCount) {
   size_t n;
   memset(m_secBuf, 0, BYTES_PER_SECTOR);
   writeMsg("Writing FAT ");
@@ -118,7 +119,7 @@ bool FatFormatter::initFatDir(uint8_t fatType, uint32_t sectorCount) {
          m_dev->writeSector(m_fatStart + m_fatSize, m_secBuf);
 }
 //------------------------------------------------------------------------------
-void FatFormatter::initPbs() {
+CODE_LOCATION_SDFAT void FatFormatter::initPbs() {
   PbsFat_t* pbs = reinterpret_cast<PbsFat_t*>(m_secBuf);
   memset(m_secBuf, 0, BYTES_PER_SECTOR);
   pbs->jmpInstruction[0] = 0XEB;
@@ -143,7 +144,7 @@ void FatFormatter::initPbs() {
   setLe16(pbs->signature, PBR_SIGNATURE);
 }
 //------------------------------------------------------------------------------
-bool FatFormatter::makeFat16() {
+CODE_LOCATION_SDFAT bool FatFormatter::makeFat16() {
   uint32_t nc;
   uint32_t r;
   PbsFat_t* pbs = reinterpret_cast<PbsFat_t*>(m_secBuf);
@@ -195,7 +196,7 @@ bool FatFormatter::makeFat16() {
   return initFatDir(16, m_dataStart - m_fatStart);
 }
 //------------------------------------------------------------------------------
-bool FatFormatter::makeFat32() {
+CODE_LOCATION_SDFAT bool FatFormatter::makeFat32() {
   uint32_t nc;
   uint32_t r;
   PbsFat_t* pbs = reinterpret_cast<PbsFat_t*>(m_secBuf);
@@ -269,7 +270,7 @@ bool FatFormatter::makeFat32() {
   return initFatDir(32, 2*m_fatSize + m_sectorsPerCluster);
 }
 //------------------------------------------------------------------------------
-bool FatFormatter::writeMbr() {
+CODE_LOCATION_SDFAT bool FatFormatter::writeMbr() {
   memset(m_secBuf, 0, BYTES_PER_SECTOR);
   MbrSector_t* mbr = reinterpret_cast<MbrSector_t*>(m_secBuf);
 
